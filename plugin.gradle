@@ -1,0 +1,72 @@
+class BuildConfigExtension {
+    def version = ""
+    def group = ""
+    def configFieldMap = [:]
+}
+
+
+class SampleProjectPlugin implements Plugin<Project> {
+
+    @Override
+    void apply(Project project) {
+        println project.name
+
+        println "Start building $project.name"
+
+        def buildExtension = project.extensions.create("config", BuildConfigExtension)
+
+        File baseDir = new File("src")
+        File buildDir = new File("build")
+
+        File subDirJava = new File(baseDir, "java")
+        File subDirRes = new File(baseDir, "resources")
+
+        baseDir.mkdirs()
+        subDirJava.mkdirs()
+        subDirRes.mkdirs()
+        buildDir.mkdirs()
+
+        project.tasks.create("build") {
+            doFirst {
+                println "Reading from buildConfig"
+
+                println "version $buildExtension.version"
+
+                
+                baseDir.mkdirs()
+                subDirJava.mkdirs()
+                subDirRes.mkdirs()
+                buildDir.mkdirs()
+
+                if ( !buildExtension.group.isEmpty()) {
+                    File packageDir = new File(subDirJava, buildExtension.group.replace('.' as char,File.separatorChar))
+                    packageDir.mkdirs()
+                }
+                println "Directory structure complete"
+            }
+        }
+
+        project.tasks.create("clean"){
+            doFirst{
+                println "Cleaning $project.name"
+
+                File buildDir = new File("build")
+                deleteDir(buildDir)
+            }
+        }
+
+        println "End building file tree"
+    }
+
+    void deleteDir(File file) {
+        File[] contents = file.listFiles();
+        if (contents != null) {
+            for (File f : contents) {
+                deleteDir(f);
+            }
+        }
+        file.delete();
+    }
+}
+
+apply plugin: SampleProjectPlugin 

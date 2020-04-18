@@ -1,0 +1,11 @@
+
+apply from: 'plugin.gradle'
+
+
+build{
+        config{
+            group = "com.godwin"
+            version = "1.0"
+
+        }
+    }
